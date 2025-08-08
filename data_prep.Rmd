@@ -1,5 +1,5 @@
 ---
-  title: "Coffee Data Preparation"
+title: "Coffee Data Preparation"
 output: html_document
 ---
   
@@ -53,14 +53,19 @@ data_farmers %<>% mutate(cooperative_id = str_replace_all(str_squish(str_to_lowe
 data_farmers %<>% left_join(data_farms_stats, by = "national_id")
 
 # Load and process geospatial data
-country <- st_read(paste(getwd(),"data_wgs84", "RW_country.gpkg", sep = "/"), layer = "country") %>% 
-  st_zm(drop = T, what = "ZM") %>%  st_make_valid(.) %>% st_transform(crs = 32736)
-lakes <- st_read(paste(getwd(),"data_wgs84", "RW_lakes.gpkg", sep = "/"), layer = "lakes") %>% 
-  st_zm(drop = T, what = "ZM") %>%  st_make_valid(.) %>% st_transform(crs = 32736)
-np <- st_read(paste(getwd(),"data_wgs84", "RW_national_parks.gpkg", sep = "/"), layer = "np") %>% 
-  st_zm(drop = T, what = "ZM") %>%  st_make_valid(.) %>% st_transform(crs = 32736)
-districts <- st_read(paste(getwd(),"data_wgs84", "RW_districts.gpkg", sep = "/"), layer = "districts") %>% 
-  st_zm(drop = T, what = "ZM") %>%  st_make_valid(.) %>% st_transform(crs = 32736) %>%
+# Load and process geospatial data using reliable relative paths
+country <- st_read("data_wgs84/RW_country.gpkg", layer = "country") %>% 
+  st_zm(drop = TRUE, what = "ZM") %>%  st_make_valid() %>% 
+  st_transform(crs = 32736)
+lakes <- st_read("data_wgs84/RW_lakes.gpkg", layer = "lakes") %>% 
+  st_zm(drop = TRUE, what = "ZM") %>%  st_make_valid() %>% 
+  st_transform(crs = 32736)
+np <- st_read("data_wgs84/RW_national_parks.gpkg", layer = "np") %>% 
+  st_zm(drop = TRUE, what = "ZM") %>%  st_make_valid() %>% 
+  st_transform(crs = 32736)
+districts <- st_read("data_wgs84/RW_districts.gpkg", layer = "districts") %>% 
+  st_zm(drop = TRUE, what = "ZM") %>%  st_make_valid() %>% 
+  st_transform(crs = 32736) %>%
   mutate(district = str_to_lower(district))
 
 # --- 3. SAVE THE PROCESSED DATA ---
@@ -80,3 +85,6 @@ app_data <- list(
 # This file will be read by the Shiny app
 app_data %>% saveRDS("coffee_dashboard_data.rds")
 ```
+
+**Downloading farmers data
+**Note:** The above code is designed to be run in an R Markdown document. It fetches data from Google Sheets, processes it, and saves the final datasets into a single `.rds` file for use in a Shiny app. 
