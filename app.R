@@ -19,8 +19,13 @@ pacman::p_load(magrittr, dplyr, stringr, tidyr, lubridate,
 app_data <- readRDS("coffee_dashboard_data.rds")
 
 # Unpack the list into separate variables
-data_farmers_full <- app_data$data_farmers_full
+data_farmers <- app_data$data_farmers
 data_coops <- app_data$data_coops
+data_cws <- app_data$data_cws
+districts <- app_data$districts
+lakes <- app_data$lakes
+np <- app_data$np
+country <- app_data$country
 
 # BUILD THE DASHBOARD USING SHINY WEB FRAMEWORK
 #=================================================
@@ -539,24 +544,24 @@ server <- function(input, output, session) {
   farm_area <- reactive({
     if (rv$current_tab == "Cooperatives/CWS View" && !is.null(rv$clicked_point)) {
       if(rv$clicked_point$dataset == "data_coops") {
-        data_farmers_full %>%
+        data_farmers %>%
           filter(cooperative_id == rv$clicked_point$row$cooperative_id) %>%
           summarize(farm_area_ha = sum(area, na.rm = T)/100) %>%
           pull(farm_area_ha)
       } else {
-        data_farmers_full %>%
+        data_farmers %>%
           filter(cws_id == rv$clicked_point$row$cws_id) %>%
           summarize(farm_area_ha = sum(area, na.rm = T)/100) %>%
           pull(farm_area_ha)
       }
     } else if (rv$current_tab == "Coffee Farms View" && !is.null(rv$clicked_district)) {
-      data_farmers_full %>%
+      data_farmers %>%
         filter(district == rv$clicked_district) %>%
         summarize(farm_area_ha = sum(area, na.rm = T)/100) %>%
         pull(farm_area_ha)
     } else {
       # Default view - show all data
-      data_farmers_full %>%
+      data_farmers %>%
         summarize(farm_area_ha = sum(area, na.rm = T)/100) %>%
         pull(farm_area_ha)
     }
@@ -590,27 +595,27 @@ server <- function(input, output, session) {
   coffee_trees <- reactive({
     if (rv$current_tab == "Cooperatives/CWS View" && !is.null(rv$clicked_point)) {
       if(rv$clicked_point$dataset == "data_coops") {
-        data_farmers_full %>%
+        data_farmers %>%
           filter(cooperative_id == rv$clicked_point$row$cooperative_id) %>%
           group_by(age_range_coffee_trees) %>%
           summarise(nbr_coffee_trees = sum(nbr_coffee_trees, na.rm = T)) %>%
           arrange(desc(nbr_coffee_trees))
       } else {
-        data_farmers_full %>%
+        data_farmers %>%
           filter(cws_id == rv$clicked_point$row$cws_id) %>%
           group_by(age_range_coffee_trees) %>%
           summarise(nbr_coffee_trees = sum(nbr_coffee_trees, na.rm = T)) %>%
           arrange(desc(nbr_coffee_trees))
       }
     } else if (rv$current_tab == "Coffee Farms View" && !is.null(rv$clicked_district)) {
-      data_farmers_full %>%
+      data_farmers %>%
         filter(district == rv$clicked_district) %>%
         group_by(age_range_coffee_trees) %>%
         summarise(nbr_coffee_trees = sum(nbr_coffee_trees, na.rm = T)) %>%
         arrange(desc(nbr_coffee_trees))
     } else {
       # Default view - show all data
-      data_farmers_full %>%
+      data_farmers %>%
         group_by(age_range_coffee_trees) %>%
         summarise(nbr_coffee_trees = sum(nbr_coffee_trees, na.rm = T)) %>%
         arrange(desc(nbr_coffee_trees))
@@ -620,24 +625,24 @@ server <- function(input, output, session) {
   touch_points <- reactive({
     if (rv$current_tab == "Cooperatives/CWS View" && !is.null(rv$clicked_point)) {
       if(rv$clicked_point$dataset == "data_coops") {
-        data_farmers_full %>%
+        data_farmers %>%
           filter(cooperative_id == rv$clicked_point$row$cooperative_id) %>%
           separate_rows(training_topics, sep = " ") %>%
           count(training_topics, name = "frequency", sort = TRUE)
       } else {
-        data_farmers_full %>%
+        data_farmers %>%
           filter(cws_id == rv$clicked_point$row$cws_id) %>%
           separate_rows(training_topics, sep = " ") %>%
           count(training_topics, name = "frequency", sort = TRUE)
       }
     } else if (rv$current_tab == "Coffee Farms View" && !is.null(rv$clicked_district)) {
-      data_farmers_full %>%
+      data_farmers %>%
         filter(district == rv$clicked_district) %>%
         separate_rows(training_topics, sep = " ") %>%
         count(training_topics, name = "frequency", sort = TRUE)
     } else {
       # Default view - show all data
-      data_farmers_full %>%
+      data_farmers %>%
         separate_rows(training_topics, sep = " ") %>%
         count(training_topics, name = "frequency", sort = TRUE)
     }
