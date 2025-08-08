@@ -84,7 +84,7 @@ app_data <- list(
 
 # Save the single list object to an .rds file
 # This file will be read by the Shiny app
-app_data %>% saveRDS("coffee_dashboard_data.rds")
+app_data %>% saveRDS("../coffee_dashboard_data.rds")
 ```
 
 **Note:** The above code is designed to be run in an R Markdown document. It fetches data from Google Sheets, processes it, and saves the final datasets into a single `.rds` file for use in a Shiny app. 
